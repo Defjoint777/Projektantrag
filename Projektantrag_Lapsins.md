@@ -147,6 +147,10 @@ und maßgeschneiderten Lösungen. Die Erweiterung findet Anwendung in
 Werkstätten, bei Hobbyschraubern und im Schulungsumfeld der TH Georg
 Agricola.
 
+# Durchführungszeitraum
+
+Das Projekt wird im Zeitraum vom 20.09.2025 bis 30.11.2025 durchgeführt.
+
 # Vorgehensmodell
 
 Für die strukturierte Umsetzung setze ich ein erweitertes
