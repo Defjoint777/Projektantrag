@@ -1,9 +1,3 @@
-# Titel der Projektarbeit
-
-Ein Oszilloskop wird verwendet, um elektrische Signale an Sensoren,
-Aktoren, Steuergeräten und Bus-Systemen sichtbar zu machen. MetaScope:
-Erweiterung eines portablen Oszilloskops für die Automobildiagnose.
-
 # Projektbeschreibung und Ziel
 
 Im Rahmen des Projekts werde ich mehrere zentrale Systemkomponenten
@@ -32,47 +26,53 @@ ermöglichen.
 
 # Ist-Zustand und Problemstellung
 
-Der Techniker erhält den Auftrag, einen Drucksensor zu überprüfen,
-verfügt jedoch nicht über die herstellerseitigen Referenzspannungswerte.
-Er bereitet das Oszilloskop vor, indem er es mit einem
-BNC-auf-Bananen-Adapter ausstattet und die Bananenstecker einsteckt. Am
-anderen Ende sind zwei Krokodilklemmen angebracht: Eine wird an die
-Masseleitung des 3-Pin-Sensors angeschlossen, die andere an den
-Signal-Pin. Nach Anpassung von Abtastrate und Trigger-Einstellungen
-startet er die Messung. Das Oszilloskop zeigt die Differenz zwischen
-Masse und Signal in Form einer Kurve auf den X- und Y-Achsen an. Da
-jedoch keine Hersteller-Referenzwerte vorliegen, kann der Techniker
-nicht beurteilen, ob die aufgezeichneten Spannungswerte innerhalb der
-zulässigen Toleranzen liegen oder ob ein Defekt vorliegt.
+Ein Oszilloskop wird verwendet, um elektrische Signale an Sensoren,
+Aktoren, Steuergeräten und Bus-Systemen sichtbar zu machen. Der
+Techniker erhält den Auftrag, einen Drucksensor zu überprüfen, verfügt
+jedoch nicht über die herstellerseitigen Referenzspannungswerte. Er
+bereitet das Oszilloskop vor, indem er es mit einem
+BNC-auf-Bananen-Adapter ausstattet, welche mittels Krokodilklemmen
+angebrachtwerden: Eine wird an die Masseleitung des 3-Pin-Sensors
+angeschlossen, die andere an den Signal-Pin. Nach Anpassung von
+Abtastrate und Trigger-Einstellungen startet er die Messung. Das
+Oszilloskop zeigt die Differenz zwischen Masse und Signal in Form einer
+Kurve auf den X- und Y-Achsen an. Da jedoch keine
+Hersteller-Referenzwerte vorliegen, kann der Techniker nicht beurteilen,
+ob die aufgezeichneten Spannungswerte innerhalb der zulässigen
+Toleranzen liegen oder ob ein Defekt vorliegt.
 
 # Soll-Analyse und Anforderungen
 
 Um dieses Problem zu lösen mein Konzept sieht vor, dass ich einen
-Receiver, ein Backend und eine zugehörige Datenbank entwerfe. Der
-Receiver nimmt während der Messung die Rohdaten vom bestehenden
-C++-Signalserver entgegen, zerlegt sie in verarbeitbare Einheiten und
-leitet sie an das Backend weiter. Im Backend, das als REST-API
-ausgeführt wird, werden diese Datensegmente mit den vom Nutzer im
-Frontend ausgewählten Metadaten -- etwa Marke, Modell, Baujahr und
-Messstelle -- angereichert und unmittelbar gegen eine lokal betriebene
-Referenztabelle abgeglichen. Diese Datenbank beinhaltet zuvor ermittelte
-Grenzwerte für jede Kombination aus Fahrzeugtyp und Messpunkt. Die
-Validierung in der REST-API stellt sicher, dass nur Messwerte
-gespeichert werden, die innerhalb der zulässigen Spannungsbereiche
-liegen; Abweichungen werden markiert. Schließlich liefert die REST-API
-die passenden Referenzwerte an die Angular-Oberfläche, wo sie neben der
-Live-Messkurve als schattierter Bereich oder Linienband dargestellt
-werden. Auf diese Weise gewinnt der Techniker während der Messung sofort
-Klarheit darüber, ob die aufgezeichneten Spannungswerte im vorgegebenen
-Toleranzbereich bleiben, und das System bleibt zugleich modular und
-erweiterbar für künftige Funktionserweiterungen.
+Receiver, ein Backend und eine zugehörige Datenbank entwerfe. In die
+Datenbank die ich entwerfe werden Herstellermesswerte eingefügt um den
+Vergleich mit aktuellen Messwerten vergleichen zu können. Der Receiver
+nimmt während der Messung die Rohdaten vom bestehenden C++-Signalserver
+entgegen, zerlegt sie in verarbeitbare Einheiten und leitet sie an das
+Backend weiter. Im Backend, das als REST-API ausgeführt wird, werden
+diese Datensegmente mit den vom Nutzer im Frontend ausgewählten
+Metadaten -- etwa Marke, Modell, Baujahr und Messstelle -- angereichert
+und unmittelbar gegen eine lokal betriebene Referenztabelle abgeglichen.
+Diese Datenbank beinhaltet zuvor ermittelte Grenzwerte für jede
+Kombination aus Fahrzeugtyp und Messpunkt. Die Validierung in der
+REST-API stellt sicher, dass nur Messwerte gespeichert werden, die
+innerhalb der zulässigen Spannungsbereiche liegen; Abweichungen werden
+markiert. Schließlich liefert die REST-API die passenden Referenzwerte
+an die Angular-Oberfläche, wo sie neben der Live-Messkurve als
+schattierter Bereich oder Linienband dargestellt werden. Auf diese Weise
+gewinnt der Techniker während der Messung sofort Klarheit darüber, ob
+die aufgezeichneten Spannungswerte im vorgegebenen Toleranzbereich
+bleiben, und das System bleibt zugleich modular und erweiterbar für
+künftige Funktionserweiterungen.
 
 # Umsetzung und Endpunkte
 
 Für mein Projektentwurf ist geplant, zunächst einen Python-basierten
 Receiver zu entwickeln, der während der Messung die Rohdaten vom
 C++-Server empfängt, sie in passende Datenobjekte überführt und diese in
-definierten Batches an das Backend weiterleitet. Das Backend selbst wird
+definierten Batches an das Backend weiterleitet. Unter dem C++-Server
+ist ein Programm zu verstehen, was eine Eingabe des Users über Websocket
+erwartet, die das Starten der Messung ausführt. Das Backend selbst wird
 als REST-API realisiert; dort werden eingehende Datensätze
 entgegengenommen, hinsichtlich ihrer Konsistenz und ihrer Wertebereiche
 validiert und im Messungsverlauf automatisiert auf Mindest- und
@@ -124,17 +124,22 @@ vordefinierte Grenzbereiche.
 
 Im Verlauf der Umsetzung werde ich für jede technische Komponente
 gezielt abwägen, welches Werkzeug am besten zu den Anforderungen passt.
-Für das Backend stehen Python mit FastAPI, Node.js mit Express oder
-alternativ eine Go-basierte Lösung (zum Beispiel mit dem Gin-Framework)
-zur Diskussion. Bei der Wahl der Datenbank entscheide ich zwischen einer
-file-basierten SQLite-Instanz in Kombination mit SQLAlchemy, einer
+Für das Backend stehen Python mit FastAPI oder Node.js mit Express zur
+Diskussion. Bei der Wahl der Datenbank entscheide ich zwischen einer
 NoSQL-Datenbank wie MongoDB oder einer SQL-Datenbank wie PostgreSQL. Die
-Entwicklungsumgebung wähle ich aus Visual Studio Code, WebStorm oder
-PyCharm aus, während die Versionskontrolle grundsätzlich mit Git
-erfolgt. Die Projektdokumentation kann je nach Bedarf in LaTeX, in
-Microsoft Word oder in Markdown verfasst werden. Schließlich prüfe ich
-für Diagramme den Einsatz von PlantUML, draw.io oder Software Ideas
-Modeler.
+Entwicklungsumgebung wähle ich aus Visual Studio Code oder PyCharm,
+während die Versionskontrolle grundsätzlich mit Git erfolgt. Die
+Projektdokumentation kann je nach Bedarf in LaTeX, in Microsoft Word
+oder in Markdown verfasst werden. Schließlich prüfe ich für Diagramme
+den Einsatz von PlantUML oder draw.io.
+
+# Tests und Qualitätssicherung
+
+Die Korrektheit der Funktionalitäten der Anwendung wird durch Tests
+sichergestellt. Die Überprüfung der Methoden erfolgt mit Unit-Tests.
+Integrationstests stellen das korrekte Zusammenspiel der Komponenten
+sicher. Vor der Freigabe werden Abnahmetests gemeinsam mit dem
+Auftraggeber durchgeführt.
 
 # Projektumfeld
 
@@ -145,9 +150,9 @@ Auftragsentwicklung für Prozessdiagnostik über effiziente
 Marketinglösungen beliefert AI-Gruppe Kunden mit innovativen Produkten
 und maßgeschneiderten Lösungen. Die Erweiterung findet Anwendung in
 Werkstätten, bei Hobbyschraubern und im Schulungsumfeld der TH Georg
-Agricola.
+Agricolai.
 
-# Durchführungszeitraum
+# Durchführungszeitraun
 
 Das Projekt wird im Zeitraum vom 20.09.2025 bis 30.11.2025 durchgeführt.
 
@@ -163,13 +168,16 @@ auf entstehende Herausforderungen.
 Während der Durchführung stehen mir folgende Mitarbeiter der AI-Gruppe
 im Büro am Husemannplatz 5a als Ansprechpartner zur Verfügung:
 
--   Stephan Böckelmann
+-   **Stephan Böckelmann** -- Geschäftsführung, Hard- und Software
+    Engineer
 
--   Tabea Röthemeyer
+-   **Tabea Röthemeyer** -- Projektleitung, Teamlead, Frontend- und
+    Backend-Entwicklerin
 
--   Rene Glitza
+-   **Rene Glitza** -- Doktorand an der Ruhr-Universität Bochum,
+    Backend-Entwickler
 
--   Anna Theimann
+-   **Anna Theimann** -- Produktmanagerin, Schnittstellenprogrammierung
 
 # Form der Dokumentation
 
